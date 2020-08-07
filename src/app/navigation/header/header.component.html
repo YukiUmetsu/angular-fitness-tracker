@@ -1,17 +1,21 @@
-<mat-toolbar color="primary">
-  <div fxHide.gt-xs>
-    <button
-      (click)="onToggleSidenav()"
-      mat-icon-button>
-      <mat-icon class="mat-24">menu</mat-icon>
-    </button>
-  </div>
-  <div><a routerLink="/">LOGO</a></div>
-  <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
-    <ul fxLayout class="navigation-items" fxLayoutGap="10px">
-      <li><a routerLink="/signup">Signup</a></li>
-      <li><a routerLink="/login">Login</a></li>
-      <li><a routerLink="/training">Training</a></li>
-    </ul>
-  </div>
-</mat-toolbar>
+<section>
+  <mat-toolbar color="primary">
+    <div fxHide.gt-xs>
+      <button
+        (click)="onToggleSidenav()"
+        mat-icon-button>
+        <mat-icon class="mat-24">menu</mat-icon>
+      </button>
+    </div>
+    <div><a routerLink="/">LOGO</a></div>
+    <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
+      <ul fxLayout class="navigation-items" fxLayoutGap="10px">
+        <li><a routerLink="/signup" *ngIf="!isAuth">Signup</a></li>
+        <li><a routerLink="/login" *ngIf="!isAuth">Login</a></li>
+        <li><a routerLink="/training" *ngIf="isAuth">Training</a></li>
+        <li><a routerLink="/logout" *ngIf="isAuth" style="cursor: pointer" (click)="onLogout()">Logout</a></li>
+      </ul>
+    </div>
+  </mat-toolbar>
+  <div style="margin-bottom: 10px"></div>
+</section>
