@@ -1,7 +1,7 @@
 import {Exercise} from './exercise.model';
 import {Subject} from 'rxjs';
 import {AngularFirestore} from 'angularfire2/firestore';
-import {Observable} from 'rxjs';
+import {Subscription} from 'rxjs';
 import 'rxjs/add/operator/map';
 import {Injectable} from '@angular/core';
 
@@ -15,12 +15,13 @@ export class TrainingService {
   private selectedExercise: Exercise;
   private exercises: Exercise[] = [];
   private finishedExercises: Exercise[] = [];
+  private firebaseSubscription: Subscription[] = [];
 
   constructor(private db: AngularFirestore) {}
 
   // tslint:disable-next-line:typedef
   fetchAvailableExercises() {
-    return this.db
+    this.firebaseSubscription.push(this.db
       .collection('availableExercises')
       .snapshotChanges()
       .map(docArray => {
@@ -36,7 +37,7 @@ export class TrainingService {
       .subscribe((exercises: Exercise[]) => {
         this.availableExercises = exercises;
         this.exercisesChanged.next([...this.availableExercises]);
-      });
+      }));
   }
 
   startExercise(selectedId: string): void {
@@ -71,13 +72,17 @@ export class TrainingService {
   }
 
   fetchCompletedOrCancelledExercises(): void {
-    this.db.collection('finishedExercises').valueChanges().subscribe((exercises: Exercise[]) => {
+    this.firebaseSubscription.push(this.db.collection('finishedExercises').valueChanges().subscribe((exercises: Exercise[]) => {
       this.finishedExercisesChanged.next(exercises);
-    });
+    }));
   }
 
   // tslint:disable-next-line:typedef
   private addExercisesToDatabase(exercise: Exercise) {
     this.db.collection('finishedExercises').add(exercise);
+  }
+
+  cancelSubscriptions() {
+    this.firebaseSubscription.forEach(sub => sub.unsubscribe());
   }
 }
