@@ -58,17 +58,14 @@ export class AuthService {
   }
 
   login(authData: AuthData): void {
-    // this.uiService.loadingStateChanged.next(true);
     this.store.dispatch(new UI.StartLoading());
     this.angularFireAuth.auth.signInWithEmailAndPassword(
       authData.email,
       authData.password
     ).then(result => {
-      // this.uiService.loadingStateChanged.next(false);
       this.store.dispatch(new UI.StopLoading());
     })
       .catch(err => {
-        // this.uiService.loadingStateChanged.next(false);
         this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackbar(err.message, null, {duration: 3000});
       });

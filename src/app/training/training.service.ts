@@ -5,6 +5,9 @@ import {Subscription} from 'rxjs';
 import 'rxjs/add/operator/map';
 import {Injectable} from '@angular/core';
 import {UiService} from '../shared/ui.service';
+import {Store} from '@ngrx/store';
+import * as fromRoot from '../app.reducer';
+import * as UI from '../shared/ui.actions';
 
 @Injectable()
 export class TrainingService {
@@ -14,18 +17,17 @@ export class TrainingService {
   availableExercises: Exercise[] = [];
 
   private selectedExercise: Exercise;
-  private exercises: Exercise[] = [];
-  private finishedExercises: Exercise[] = [];
   private firebaseSubscription: Subscription[] = [];
 
   constructor(
     private db: AngularFirestore,
-    private uiService: UiService
+    private uiService: UiService,
+    private store: Store<{ui: fromRoot.State}>
     ) {}
 
   // tslint:disable-next-line:typedef
   fetchAvailableExercises() {
-    this.uiService.loadingStateChanged.next(true);
+    this.store.dispatch(new UI.StartLoading());
     this.firebaseSubscription.push(this.db
       .collection('availableExercises')
       .snapshotChanges()
@@ -41,10 +43,10 @@ export class TrainingService {
       })
       .subscribe((exercises: Exercise[]) => {
         this.availableExercises = exercises;
-        this.uiService.loadingStateChanged.next(false);
         this.exercisesChanged.next([...this.availableExercises]);
+        this.store.dispatch(new UI.StopLoading());
       }, error => {
-        this.uiService.loadingStateChanged.next(false);
+        this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackbar('fetching Exercises failed. Please try again.', null, 3000);
         this.exercisesChanged.next(null);
       }));
@@ -92,7 +94,7 @@ export class TrainingService {
     this.db.collection('finishedExercises').add(exercise);
   }
 
-  cancelSubscriptions() {
+  cancelSubscriptions(): void {
     this.firebaseSubscription.forEach(sub => sub.unsubscribe());
   }
 }
