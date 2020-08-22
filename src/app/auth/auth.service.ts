@@ -1,5 +1,4 @@
 import {AuthData} from './auth-data.model';
-import {Subject} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {AngularFireAuth} from 'angularfire2/auth';
@@ -9,11 +8,11 @@ import {UiService} from '../shared/ui.service';
 import * as fromRoot from '../app.reducer';
 import {Store} from '@ngrx/store';
 import * as UI from '../shared/ui.actions';
+import * as Auth from './auth.actions';
 
 // injecting service in service
 @Injectable()
 export class AuthService {
-  isAuthenticated = new Subject<boolean>();
   private isLoggedIn = false;
 
   constructor(
@@ -28,13 +27,12 @@ export class AuthService {
   initAuthListener(): void {
     this.angularFireAuth.authState.subscribe(user => {
       if (user) {
-        this.isLoggedIn = true;
-        this.isAuthenticated.next(true);
+        this.store.dispatch(new Auth.SetAuthenticated());
         this.router.navigate(['/training']);
       } else {
         this.trainingService.cancelSubscriptions();
         this.isLoggedIn = false;
-        this.isAuthenticated.next(false);
+        this.store.dispatch(new Auth.SetUnauthenticated());
         this.router.navigate(['/login']);
       }
     });
@@ -74,9 +72,4 @@ export class AuthService {
   logout(): void {
     this.angularFireAuth.auth.signOut();
   }
-
-  isAuth(): boolean{
-    return this.isLoggedIn;
-  }
-
 }
