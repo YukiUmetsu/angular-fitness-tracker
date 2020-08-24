@@ -1,4 +1,4 @@
-import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router, CanLoad, Route} from '@angular/router';
+import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, CanLoad, Route} from '@angular/router';
 import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
@@ -9,7 +9,6 @@ import {take} from 'rxjs/operators';
 export class AuthGuard implements CanActivate, CanLoad {
 
   constructor(
-    private router: Router,
     private store: Store<fromRoot.State>
   ) {}
 
@@ -18,7 +17,6 @@ export class AuthGuard implements CanActivate, CanLoad {
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.store.select(fromRoot.getIsAuth).pipe(take(1));
-    // this.router.navigate(['/login']);
   }
 
   canLoad(route: Route): any {
