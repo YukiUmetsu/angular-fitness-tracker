@@ -30,12 +30,12 @@ export class CurrentTrainingComponent implements OnInit, OnDestroy {
     clearInterval(this.timer);
   }
 
-  startOrResumeTimer(): void{
+  startOrResumeTimer(): void {
     this.store.select(fromTraining.getActiveTraining).pipe(take(1)).subscribe(ex => {
-      const step = ex.duration / (100 * 1000);
+      const step = ex.duration / 100 * 1000;
       this.timer = setInterval(() => {
         this.progress = this.progress + 1;
-        if (this.progress >= 100){
+        if (this.progress >= 100) {
           this.trainingService.completeExercise();
           clearInterval(this.timer);
         }
